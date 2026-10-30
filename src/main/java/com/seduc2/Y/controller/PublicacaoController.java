@@ -2,9 +2,7 @@ package com.seduc2.Y.controller;
 
 import com.seduc2.Y.entity.Publicacao;
 import com.seduc2.Y.service.PublicacaoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,15 +10,20 @@ import java.util.List;
 @RequestMapping("/api/publicacoes")
 public class PublicacaoController {
 
-    private final PublicacaoService publicacaoService;
+    private final PublicacaoService service;
 
-    public PublicacaoController(PublicacaoService publicacaoService) {
-        this.publicacaoService = publicacaoService;
+    public PublicacaoController(PublicacaoService service) {
+        this.service = service;
     }
 
     @GetMapping
     public List<Publicacao> mostrarPublicacoes(){
-        return publicacaoService.mostrarPublicacoes();
+        return service.mostrarPublicacoes();
+    }
+
+    @PostMapping
+    public void fazerPublicacao(@RequestBody Publicacao publicacao){
+        service.fazerPublicacao(publicacao);
     }
 
 }
