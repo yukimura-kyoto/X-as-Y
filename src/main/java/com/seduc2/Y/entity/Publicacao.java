@@ -1,9 +1,6 @@
 package com.seduc2.Y.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Publicacao {
@@ -12,9 +9,16 @@ public class Publicacao {
     private Long id;
     private String usuario;
     private String legenda;
+    @Column(length = 1000)
     private String imagem;
 
     public Publicacao(){}
+
+    public Publicacao(String imagem, String legenda, String usuario) {
+        this.imagem = imagem;
+        this.legenda = legenda;
+        this.usuario = usuario;
+    }
 
     public Publicacao(Long id, String usuario, String legenda, String imagem) {
         this.id = id;
