@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>X</title>
+<style>
+  :root{
+    --bg:#000; --text:#e7e9ea; --sub:#71767b; --line:#2f3336; --blue:#1d9bf0;
+    --hover:rgba(231,233,234,.06); --like:#f91880; --green:#00ba7c;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{background:var(--bg);color:var(--text);
+    font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;font-size:15px}
+  button,input,textarea{font:inherit;color:inherit}
+  button{background:none;border:0;cursor:pointer}
+  svg{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  .layout{display:flex;justify-content:center;min-height:100vh}
+
+  /* ---------- Sidebar ---------- */
+  .side{width:275px;padding:0 12px;position:sticky;top:0;height:100vh;
+    display:flex;flex-direction:column;justify-content:space-between}
+  .side nav{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-top:4px}
+  .logo{width:50px;height:50px;display:grid;place-items:center;border-radius:999px}
+  .logo:hover,.nav a:hover{background:var(--hover)}
+  .logo svg{width:30px;height:30px;fill:var(--text);stroke:none}
+  .nav a{display:flex;align-items:center;gap:20px;padding:12px;border-radius:999px;
+    color:var(--text);text-decoration:none;font-size:20px}
+  .nav a svg{width:27px;height:27px}
+  .nav a.on{font-weight:700}
+  .btn-post{margin-top:16px;width:90%;height:52px;border-radius:999px;background:#eff3f4;
+    color:#0f1419;font-weight:700;font-size:17px}
+  .btn-post:hover{background:#d7dbdc}
+  .me{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:12px;border-radius:999px;cursor:pointer}
+  .me:hover{background:var(--hover)}
+  .me b{display:block;font-size:15px}
+  .me span{color:var(--sub)}
+  .me .dots{margin-left:auto;width:20px;height:20px}
+
+  /* ---------- Feed ---------- */
+  .feed{width:600px;max-width:100%;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  .tabs{position:sticky;top:0;z-index:5;display:flex;background:rgba(0,0,0,.75);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .tab{flex:1;height:53px;color:var(--sub);font-weight:500;position:relative}
+  .tab:hover{background:var(--hover)}
+  .tab.on{color:var(--text);font-weight:700}
+  .tab.on::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+    width:56px;height:4px;border-radius:4px;background:var(--blue)}
+
+  .avatar{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+    font-weight:700;font-size:17px;color:#fff;text-transform:uppercase;user-select:none}
+
+  /* composer */
+  .composer{display:flex;gap:12px;padding:12px 16px 0;border-bottom:1px solid var(--line)}
+  .composer .box{flex:1;min-width:0}
+  .composer textarea{width:100%;background:none;border:0;resize:none;outline:0;
+    font-size:20px;padding:10px 0;min-height:52px}
+  .composer textarea::placeholder,.field::placeholder{color:var(--sub)}
+  .field{width:100%;background:none;border:1px solid var(--line);border-radius:8px;
+    padding:8px 12px;outline:0;font-size:14px;margin-bottom:8px}
+  .field:focus{border-color:var(--blue)}
+  .preview{max-height:300px;width:100%;object-fit:cover;border-radius:16px;
+    border:1px solid var(--line);margin-bottom:8px}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;
+    border-top:1px solid var(--line)}
+  .count{color:var(--sub);font-size:13px;margin-right:12px}
+  .count.over{color:#f4212e}
+  .btn-send{height:36px;padding:0 18px;border-radius:999px;background:#eff3f4;color:#0f1419;font-weight:700}
+  .btn-send:disabled{opacity:.5;cursor:default}
+
+  /* posts */
+  .post{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);position:relative}
+  .post:hover{background:rgba(255,255,255,.03)}
+  .post .main{min-width:0;flex:1}
+  .head{display:flex;gap:4px;align-items:baseline;flex-wrap:wrap}
+  .head b{font-weight:700}
+  .head span{color:var(--sub)}
+  .legenda{margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.35}
+  .img{margin-top:12px;width:100%;max-height:520px;object-fit:cover;display:block;
+    border-radius:16px;border:1px solid var(--line)}
+  .actions{display:flex;justify-content:space-between;max-width:425px;margin-top:10px;color:var(--sub)}
+  .act{display:flex;align-items:center;gap:6px;font-size:13px;padding:4px;border-radius:999px}
+  .act svg{width:19px;height:19px}
+  .act.reply:hover{color:var(--blue)}
+  .act.repost:hover{color:var(--green)}
+  .act.like:hover,.act.like.on{color:var(--like)}
+  .act.like.on svg{fill:var(--like)}
+  .act.views:hover{color:var(--blue)}
+  .del{position:absolute;top:8px;right:12px;width:34px;height:34px;border-radius:50%;
+    color:var(--sub);display:none;place-items:center}
+  .post:hover .del{display:grid}
+  .del:hover{color:#f4212e;background:rgba(244,33,46,.1)}
+  .del svg{width:18px;height:18px}
+
+  /* states */
+  .state{padding:40px 24px;text-align:center;color:var(--sub);line-height:1.5}
+  .state h2{color:var(--text);font-size:22px;margin-bottom:8px}
+  .state code{background:#16181c;padding:2px 6px;border-radius:4px;color:var(--text)}
+  .state .row{margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn-line{height:36px;padding:0 18px;border-radius:999px;border:1px solid var(--line);font-weight:700}
+  .btn-line:hover{background:var(--hover)}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--blue);
+    color:#fff;padding:12px 18px;border-radius:8px;z-index:20;display:none;max-width:90vw}
+  .toast.err{background:#f4212e}
+
+  /* responsivo */
+  @media (max-width:1100px){
+    .side{width:76px;align-items:center}
+    .nav a span,.me div,.me .dots{display:none}
+    .nav a{padding:12px}
+    .btn-post{width:50px;height:50px;font-size:0;position:relative}
+    .btn-post::after{content:"+";font-size:26px}
+  }
+  @media (max-width:600px){
+    .side{display:none}
+    .feed{border:0}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===== Menu lateral ===== -->
+  <aside class="side">
+    <nav class="nav">
+      <a class="logo" href="#" aria-label="X">
+        <svg viewBox="0 0 24 24"><path d="M18.2 2.25h3.3l-7.2 8.26 8.5 11.24h-6.66l-5.2-6.82-5.97 6.82H1.7l7.7-8.82L1.25 2.25H8.1l4.7 6.23 5.4-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.92 15.64Z" style="fill:currentColor"/></svg>
+      </a>
+      <a class="on" href="#"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" style="fill:currentColor"/></svg><span>Home</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Explore</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/></svg><span>Notifications</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M19 8v6M16 11h6"/></svg><span>Follow</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2.5-.3 3.5-.8L20 21l-1.3-4.2A9 9 0 0 0 12 3z"/></svg><span>Chat</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg><span>Calls</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m5 19 14-14"/></svg><span>Grok</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.6"/></svg><span>More</span></a>
+      <button class="btn-post" id="sideBtn">Post</button>
+    </nav>
+    <div class="me" id="me">
+      <div class="avatar" id="meAvatar"></div>
+      <div><b id="meName"></b><span id="meHandle"></span></div>
+      <svg class="dots" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></svg>
+    </div>
+  </aside>
+
+  <!-- ===== Feed ===== -->
+  <main class="feed">
+    <div class="tabs">
+      <button class="tab on" id="tabFor">For you</button>
+      <button class="tab" id="tabFollowing">Following</button>
+    </div>
+
+    <section class="composer">
+      <div class="avatar" id="compAvatar"></div>
+      <div class="box">
+        <input class="field" id="usuario" placeholder="Seu usuário" maxlength="40" style="margin-top:10px" />
+        <textarea id="legenda" rows="1" placeholder="What’s happening?" maxlength="280"></textarea>
+        <input class="field" id="imagem" placeholder="Link da imagem (opcional)" />
+        <img class="preview" id="preview" alt="" hidden />
+        <div class="bar">
+          <span style="color:var(--blue);font-size:13px">Dados enviados: usuario, legenda, imagem</span>
+          <div style="display:flex;align-items:center">
+            <span class="count" id="count">280</span>
+            <button class="btn-send" id="send" disabled>Post</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="list"></div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO DA API  — troque aqui pela URL da sua API
+   GET    {API_URL}        -> [{ id, usuario, legenda, imagem }]
+   POST   {API_URL}        -> body { usuario, legenda, imagem }
+   DELETE {API_URL}/{id}   -> (opcional) apaga o post
+   ============================================================ */
+const API_URL = 'http://localhost:8080/api/posts';
+
+const $ = id => document.getElementById(id);
+const list = $('list');
+let posts = [];
+let usandoExemplo = false;
+
+const EXEMPLO = [
+  { id: 3, usuario: 'Grok Bot', legenda: 'Dê qualquer tarefa. Veja voltar com o trabalho pronto.', imagem: '' },
+  { id: 2, usuario: 'Ana Souza', legenda: 'Primeiro post da aula de API!\nFunciona mesmo?', imagem: 'https://picsum.photos/seed/aula/800/450' },
+  { id: 1, usuario: 'Carlos Lima', legenda: 'Spring Boot + HTML = ❤', imagem: 'https://picsum.photos/seed/java/800/450' }
+];
+
+/* ---------- utilidades ---------- */
+const handle = u => '@' + String(u || 'anonimo').toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9_]/g, '');
+const cores = ['#1d9bf0','#7856ff','#f91880','#ff7a00','#00ba7c','#e0245e','#17bf63'];
+function cor(nome){ let h = 0; for (const c of String(nome)) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return cores[Math.abs(h) % cores.length]; }
+function avatar(el, nome){ el.textContent = String(nome || '?').trim().charAt(0) || '?'; el.style.background = cor(nome); }
+function aviso(msg, erro){ const t = $('toast'); t.textContent = msg; t.className = 'toast' + (erro ? ' err' : '');
+  t.style.display = 'block'; clearTimeout(aviso.t); aviso.t = setTimeout(() => t.style.display = 'none', 3500); }
+function el(tag, cls, txt){ const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+const svg = d => `<svg viewBox="0 0 24 24">${d}</svg>`;
+const ICON = {
+  reply: svg('<path d="M12 4a8 8 0 0 0 0 16c1.5 0 2.7-.3 3.7-.9L20 20l-1-4a8 8 0 0 0-7-12z"/>'),
+  repost: svg('<path d="m17 3 4 4-4 4M3 11V9a2 2 0 0 1 2-2h16M7 21l-4-4 4-4m14-2v2a2 2 0 0 1-2 2H3"/>'),
+  like: svg('<path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/>'),
+  views: svg('<path d="M5 21V12M12 21V4M19 21v-6"/>'),
+  trash: svg('<path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/>')
+};
+
+/* ---------- usuário atual ---------- */
+let eu = '';
+try { eu = localStorage.getItem('usuario') || ''; } catch (e) {}
+function atualizaEu(){
+  const nome = eu || 'Visitante';
+  avatar($('meAvatar'), nome); avatar($('compAvatar'), nome);
+  $('meName').textContent = nome; $('meHandle').textContent = handle(nome);
+}
+$('usuario').value = eu;
+$('usuario').addEventListener('input', e => {
+  eu = e.target.value.trim(); try { localStorage.setItem('usuario', eu); } catch (_) {}
+  atualizaEu(); validar();
+});
+atualizaEu();
+
+/* ---------- desenhar posts ---------- */
+function cartao(p){
+  const art = el('article', 'post');
+  const av = el('div', 'avatar'); avatar(av, p.usuario);
+  const main = el('div', 'main');
+
+  const head = el('div', 'head');
+  head.append(el('b', '', p.usuario || 'Anônimo'), el('span', '', handle(p.usuario)));
+  main.append(head, el('div', 'legenda', p.legenda || ''));
+
+  if (p.imagem) {
+    const img = el('img', 'img'); img.src = p.imagem; img.alt = 'Imagem do post'; img.loading = 'lazy';
+    img.onerror = () => img.remove();
+    main.append(img);
+  }
+
+  const acts = el('div', 'actions');
+  [['reply', 0], ['repost', 0], ['like', 0], ['views', 0]].forEach(([k]) => {
+    const b = el('button', 'act ' + k); b.innerHTML = ICON[k] + '<span></span>';
+    if (k === 'like') b.onclick = () => {
+      const on = b.classList.toggle('on'); b.lastChild.textContent = on ? '1' : '';
+    };
+    acts.append(b);
+  });
+  main.append(acts);
+
+  if (!usandoExemplo) {
+    const d = el('button', 'del'); d.innerHTML = ICON.trash; d.title = 'Apagar post';
+    d.onclick = () => apagar(p.id);
+    art.append(d);
+  }
+  art.prepend(av, main);
+  return art;
+}
+function render(){
+  list.replaceChildren();
+  if (!posts.length) {
+    const s = el('div', 'state'); s.append(el('h2', '', 'Nada por aqui ainda'), el('p', '', 'Escreva o primeiro post acima.'));
+    list.append(s); return;
+  }
+  [...posts].sort((a, b) => b.id - a.id).forEach(p => list.append(cartao(p)));
+}
+function erroTela(msg){
+  list.replaceChildren();
+  const s = el('div', 'state');
+  const p = el('p'); p.append('Não consegui falar com ', Object.assign(el('code'), { textContent: API_URL }), '.');
+  s.append(el('h2', '', 'API fora do ar'), p, el('p', '', msg));
+  const row = el('div', 'row');
+  const a = el('button', 'btn-line', 'Tentar de novo'); a.onclick = carregar;
+  const b = el('button', 'btn-line', 'Ver dados de exemplo'); b.onclick = () => { usandoExemplo = true; posts = [...EXEMPLO]; render(); };
+  row.append(a, b); s.append(row); list.append(s);
+}
+
+/* ---------- chamadas à API ---------- */
+async function carregar(){
+  usandoExemplo = false;
+  list.replaceChildren(Object.assign(el('div', 'state'), { textContent: 'Carregando…' }));
+  try {
+    const r = await fetch(API_URL);
+    if (!r.ok) throw new Error('A API respondeu com status ' + r.status + '.');
+    const dados = await r.json();
+    posts = Array.isArray(dados) ? dados : [];
+    render();
+  } catch (e) { erroTela(e.message || 'Verifique se o servidor está rodando e se o CORS está liberado.'); }
+}
+async function publicar(){
+  const corpo = { usuario: $('usuario').value.trim(), legenda: $('legenda').value.trim(), imagem: $('imagem').value.trim() };
+  $('send').disabled = true;
+  try {
+    if (usandoExemplo) {
+      posts.unshift({ id: Date.now(), ...corpo });
+    } else {
+      const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+      if (!r.ok) throw new Error('Status ' + r.status);
+      await carregar();
+    }
+    $('legenda').value = ''; $('imagem').value = ''; $('preview').hidden = true;
+    contar(); render(); aviso('Post publicado!');
+  } catch (e) { aviso('Não foi possível publicar. ' + e.message, true); }
+  validar();
+}
+async function apagar(id){
+  try {
+    const r = await fetch(API_URL + '/' + id, { method: 'DELETE' });
+    if (!r.ok) throw new Error('Status ' + r.status);
+    posts = posts.filter(p => p.id !== id); render(); aviso('Post apagado.');
+  } catch (e) { aviso('Não foi possível apagar. ' + e.message, true); }
+}
+
+/* ---------- composer ---------- */
+function contar(){
+  const n = 280 - $('legenda').value.length;
+  $('count').textContent = n; $('count').classList.toggle('over', n < 0);
+}
+function validar(){ $('send').disabled = !($('usuario').value.trim() && $('legenda').value.trim()); }
+$('legenda').addEventListener('input', e => {
+  e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; contar(); validar();
+});
+$('imagem').addEventListener('input', e => {
+  const v = e.target.value.trim(), pv = $('preview');
+  if (!v) { pv.hidden = true; return; }
+  pv.src = v; pv.onload = () => pv.hidden = false; pv.onerror = () => pv.hidden = true;
+});
+$('send').onclick = publicar;
+$('sideBtn').onclick = () => $('legenda').focus();
+$('tabFor').onclick = carregar;
+$('tabFollowing').onclick = () => {
+  $('tabFor').classList.remove('on'); $('tabFollowing').classList.add('on');
+  list.replaceChildren(Object.assign(el('div', 'state'), { textContent: 'Ainda não segue ninguém.' }));
+};
+$('tabFor').addEventListener('click', () => { $('tabFollowing').classList.remove('on'); $('tabFor').classList.add('on'); });
+
+validar();
+carregar();
+</script>
+</body>
+</html>
